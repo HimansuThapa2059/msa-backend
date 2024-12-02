@@ -19,17 +19,32 @@ class MsaController extends Controller implements HasMiddleware
         ];
     }
 
-    public function index(){
-        $user =  auth('sanctum')->user();
+    public function index(Request $request)
+    {
+        $user = auth('sanctum')->user();
+    
         if (!$user) {
             return response()->json([
                 'message' => 'Unauthorized',
             ], 401);
         }
-
-        $msas = Msa::where('user_id', $user->id)->get();;
+    
+        $validated = $request->validate([
+            'type' => 'nullable|in:movie,anime,series,other', 
+        ]);
+    
+        $type = $validated['type'] ?? null;
+    
+        $msas = Msa::where('user_id', $user->id);
+    
+        if ($type) {
+            $msas->where('type', $type);
+        }
+        $msas = $msas->get();
+    
         return MsaResource::collection($msas);
     }
+    
 
     public function store(Request $request){
         $allowedFields = ['name', 'type', 'rating', 'genre', 'description'];

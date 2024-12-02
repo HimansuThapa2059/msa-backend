@@ -34,7 +34,7 @@ class AuthController extends Controller
 
         if($valid->fails()){
             return response()->json([
-                'message' => 'All fields are mandetory',
+                'message' => 'Email not found',
                 'error' => $valid->messages()
             ], 400);
         }
